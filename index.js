@@ -3,7 +3,7 @@ const moment = require("moment");
 const cron = require("node-cron");
 const axios = require("axios");
 const { mailService } = require("./mail");
-const { pinCode } = require("./key");
+const { pinCode, age } = require("./key");
 
 let count = 0;
 const state = {};
@@ -26,14 +26,7 @@ const getApiResponse = async date => {
   try {
     const result = await axios.get(
       `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByPin?pincode=${pinCode}&date=${date}`,
-      {
-        headers: {
-          accept: "application/json",
-          "Accept-Language": "hi_IN",
-          "user-agent":
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36",
-        },
-      }
+      { headers: { accept: "application/json", "Accept-Language": "hi_IN" } }
     );
     return result ? result.data : null;
   } catch (e) {
@@ -43,11 +36,12 @@ const getApiResponse = async date => {
 
 const checkAvailability = async () => {
   count = count + 1;
-  const dates = numberOfDays(30);
+  const dates = numberOfDays(10);
   const data = await Promise.all(dates.map(date => getApiResponse(date)));
-  const availableSlots = data.filter(
-    item => item && item.sessions && item.sessions.length
-  );
+  const availableSlots = data
+    .filter(item => item && item.sessions && item.sessions.length)
+    .map(item => item.sessions.filter(session => session.min_age_limit <= age))
+    .flat();
   state.availableSlots = availableSlots || [];
   state.data = data || [];
   if (availableSlots.length) {
@@ -63,7 +57,7 @@ const checkAvailability = async () => {
 
 const main = async () => {
   try {
-    cron.schedule("* * * * *", async () => {
+    cron.schedule("* * * * * *", async () => {
       await checkAvailability();
     });
   } catch (e) {
