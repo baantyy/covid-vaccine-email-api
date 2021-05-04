@@ -1,8 +1,15 @@
+const express = require("express");
 const moment = require("moment");
 const cron = require("node-cron");
 const axios = require("axios");
 const { mailService } = require("./mail");
 const { pinCode } = require("./key");
+
+let count = 0;
+const state = {};
+
+const app = express();
+const port = process.env.PORT || 3005;
 
 const numberOfDays = (number = 1) =>
   Array(number)
@@ -27,7 +34,6 @@ const getApiResponse = async date => {
   }
 };
 
-let count = 0;
 const checkAvailability = async () => {
   count = count + 1;
   const dates = numberOfDays(30);
@@ -35,6 +41,8 @@ const checkAvailability = async () => {
   const availableSlots = data.filter(
     item => item && item.sessions && item.sessions.length
   );
+  state.availableSlots = availableSlots || [];
+  state.data = data || [];
   if (availableSlots.length) {
     // whenever available keep on notifying every minute
     notifyMe(true, availableSlots);
@@ -56,6 +64,10 @@ const main = async () => {
   }
 };
 
-main().then(() => {
-  console.log("Vaccine availability checking started");
+main().then(() => console.log("Vaccine availability checking started"));
+
+app.get("*", (req, res) => {
+  res.send({ count, ...state });
 });
+
+app.listen(port, () => console.log("Listening on port " + port));
