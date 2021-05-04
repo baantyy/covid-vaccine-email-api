@@ -57,7 +57,7 @@ const checkAvailability = async () => {
 
 const main = async () => {
   try {
-    cron.schedule("* * * * * *", async () => {
+    cron.schedule("* * * * *", async () => {
       await checkAvailability();
     });
   } catch (e) {
