@@ -26,7 +26,14 @@ const getApiResponse = async date => {
   try {
     const result = await axios.get(
       `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByPin?pincode=${pinCode}&date=${date}`,
-      { headers: { accept: "application/json", "Accept-Language": "hi_IN" } }
+      {
+        headers: {
+          accept: "application/json",
+          "Accept-Language": "hi_IN",
+          "user-agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36",
+        },
+      }
     );
     return result ? result.data : null;
   } catch (e) {
