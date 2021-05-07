@@ -1,16 +1,15 @@
 const nodemailer = require("nodemailer");
-const { mailAuth, email } = require("./key");
+const { mailAuth, email, emailFrom } = require("./key");
 
 const mailService = async (available = false, html = "", cb = () => 0) => {
   try {
-    const from = "baaantyyy@gmail.com";
     const time = new Date().toLocaleString("en-US", {
       timeZone: "Asia/Kolkata",
     });
     const info = await nodemailer.createTransport(mailAuth).sendMail({
-      from: `Covid Vaccine <${from}>`,
+      from: `Covid Vaccine <${emailFrom}>`,
       to: email,
-      replyTo: from,
+      replyTo: emailFrom,
       subject: `Covid Vaccine ${
         available ? "Available" : "Unavailable"
       } - ${time}`,

@@ -1,8 +1,9 @@
 require("dotenv").config();
 
-const pinCode = process.env.PINCODE;
-const email = process.env.EMAIL;
 const age = process.env.AGE;
+const email = process.env.EMAIL;
+const emailFrom = process.env.EMAIL_FROM;
+const pinCode = process.env.PINCODE;
 
 const mailAuth = {
   host: process.env.SMTP_HOST,
@@ -11,4 +12,4 @@ const mailAuth = {
   auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
 };
 
-module.exports = { pinCode, email, age, mailAuth };
+module.exports = { age, pinCode, email, emailFrom, mailAuth };
